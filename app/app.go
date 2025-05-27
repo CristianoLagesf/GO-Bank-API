@@ -1,16 +1,18 @@
 package app
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func Start() {
-	http.HandleFunc("/home",
-		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, "hello")
-		})
-	http.HandleFunc("/customers", getAllCustomer)
+	router := mux.NewRouter()
+	router.HandleFunc("/home", getHome).Methods(http.MethodGet)
+	router.HandleFunc("/customers", getAllCustomer).Methods(http.MethodGet)
+	router.HandleFunc("/customers/{customer_id:[0-9]+}", getCustomer).Methods(http.MethodGet)
+	router.HandleFunc("/customers", createCustomer).Methods(http.MethodPost)
 
-	http.ListenAndServe("localhost:8000", nil)
+	log.Fatal(http.ListenAndServe("localhost:8000", router))
 }
